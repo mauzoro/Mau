@@ -13,7 +13,7 @@ var con = mysql.createConnection({
 //Udp conection
 const dgram = require('dgram');
 const UDP_PORT = '53000';
-const IP_ADRESS = '54.90.135.135';
+const IP_ADRESS = '192.168.0.13';
 const server = dgram.createSocket('udp4');
 server.on('error', (err) => {
     console.log(`server error:\n${err.stack}`);
@@ -63,8 +63,9 @@ app.set("public", __dirname + "/public");
 app.use("/public",express.static('./public/'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 app.get('/', function(request, response) {
-    response.sendFile(path.join(__dirname, '../public/index.html'))
+    response.sendFile(path.join(__dirname, '../mau/public/index.html'))
 });
 
 app.get('/tr', (req, res) => {
@@ -84,13 +85,36 @@ app.post("/historicos", (req,res)=>{
     if (con) {
         console.log("Connected!");
         var sql =
-          "SELECT * FROM Syrus where fecha between ? and ? and hora between ? and ? ";
+          "SELECT * FROM Syrus where (fecha BETWEEN ? AND ?)AND (hora BETWEEN ? AND ?)";
         var value = [
-          req.body.fecha1,
+          req.body.fecha1,         
           req.body.fecha2,
           req.body.hora1,
           req.body.hora2
         ];
+        console.log(value)
+        con.query(sql, value, function(err, result) {
+          if (err) throw err;
+          res.json(result)
+          //con.end();
+        });
+      } else {
+        console.log("Error conection with db");
+      }
+});
+app.post("/historicos2", (req,res)=>{
+        
+    if (con) {
+        console.log("Connected!");
+        var sql =
+        "SELECT * FROM Syrus WHERE(latitud  BETWEEN ? AND ? )AND (longitud  BETWEEN ? AND ?)";
+        var value = [
+          req.body.lat1,
+          req.body.lat2,
+          req.body.lon1,
+          req.body.lon2
+        ];
+        
         con.query(sql, value, function(err, result) {
           if (err) throw err;
           res.json(result);

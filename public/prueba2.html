@@ -4,45 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+   <style>
+       .body{
+width: 105%;
+height: 700px;
+background:#FFCC99;
+
+}
+   </style>
 </head>
 <body>
-    <div class="box">
-        <center><div class="box1">
-            <div class="label">
-                Fecha incial :
-            </div>
-            <input type="date" id="fecha1" />
-        </div>
-        <div class="box1">
-            <div class="label">
-                Hora incial :
-            </div>
-            <input type="time" id="hora1" />
-        </div>
-        <div class="box1">
-            <div class="label">
-                Fecha final :
-            </div>
-            <input type="date" id="fecha2" />
-    
-        </div>
-        <div class="box1">
-            <div class="label">
-                Hora final :
-            </div>
-            <input type="time" id="hora2" />
-        </div>
-        <br>
-        <input type="submit" value="Enviar" id="bth">    
-    </center>
-    
-    </div>
-    
-    <script  src="../static/assets/js/prueba2.js" >
-       
-        
-    </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <div class="body">
 
+    </div>
+    <script>
+        $(window).scroll(function(event) {
+        var scrollLeft = $(this).scrollLeft();
+        console.log("Horizontal "+scrollLeft);
+      });
+    </script>
+    
+    
 </body>
 </html>
     

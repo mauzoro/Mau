@@ -2,21 +2,15 @@ var lat, lon, fecha, hora, mensaj, poli,f1,f2,h1,h2,btn;
 var road = []
 var tama=0;
 var n=1;
-let map = L.map('main').setView([10.99304, -74.82814], 13);
+let map = L.map('map').setView([10.99304, -74.82814], 13);
 const tileurl2 = 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
 L.tileLayer(tileurl2).addTo(map);
 var marcador = L.marker([0, 0]);
 marcador.addTo(map);
 //content
-var titulo ='<h1> Historicos </h1>';
-var contents='<div id="p"></div>';
-var slideMenu= L.control.slideMenu('',{width:'50%',   icon:'fa-chevron-right'}).addTo(map);
-slideMenu.setContents(titulo + contents);
-$.ajax({
-    type: "GET",
-    url : '../public/prueba2.html',
-    success: function(datos){
-        $("#p").html(datos);
+
+
+
         
         f1 = document.getElementById("fecha1");
         f2 = document.getElementById("fecha2");
@@ -29,7 +23,7 @@ $.ajax({
         f1.max=date.getFullYear()+ "-" + mes.toString().slice(2,5) + "-" + date.getDate();
         f2.value= date.getFullYear()+ "-" + mes.toString().slice(2,5) + "-" + date.getDate();
         f2.max=date.getFullYear()+ "-" + mes.toString().slice(2,5) + "-" + date.getDate();
-        h1.value="00:00:01";
+        h1.value="00:00:05";
         h2.value="23:59:59";
         btn = document.getElementById("bth");
    ;  
@@ -48,7 +42,12 @@ $.ajax({
             let h22 = t22[0]*3600000+ t22[1]*60000+t22[2]*1000;
             let total1 = h11+f11;
             let total2 = h22+f22;
-
+            console.log(f11)
+            console.log(t11)
+            console.log(`El total 1 es: ${total1}`)
+            console.log(`EL total 2 es: ${total2} `)
+            console.log(f22)
+            console.log(t22)
             if (total2 >= total1){
                 console.log("En orden")
                 let data = {
@@ -90,8 +89,7 @@ $.ajax({
             }
         })
      
-    }
-});
+
 //contents = contents.substr(0,5);
 
 
