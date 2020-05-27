@@ -6,7 +6,7 @@ var long=[];
 var fechaa=[];
 var horaa=[];
 var n=1;
-
+var vacio ;
 cambio = document.getElementById("aparecer")
 let map = L.map('map').setView([10.976816, -74.799264], 15);
 const tileurl2 = 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -28,6 +28,7 @@ var customIcon2 = new L.Icon({
     iconAnchor: [25,25]
 });
 map.on("click",(e)=>{
+   
     if(i==0){
          marker1 = L.marker(e.latlng,{draggable:'true',icon:customIcon}).addTo(map);
         rec.push(e.latlng)
@@ -77,14 +78,19 @@ function cambiar2(event) {
 }
 var p= 0;
 function consultar(){
+            var truck = document.querySelector('input[name="id"]:checked').value;
             
+            if (truck == "CAE"){
+
+                consulta2()
+            }
             consulta={
+                id_t:"ID="+truck,
                 lat1:rect.getBounds().getSouth(),
                 lat2:rect.getBounds().getNorth(),
                 lon1:rect.getBounds().getWest(),
                 lon2:rect.getBounds().getEast()
             }
-           
             fetch("/historicos2",{
                 method: 'POST',
                 body: JSON.stringify(consulta),
@@ -95,7 +101,13 @@ function consultar(){
                 return res.json()
             }).then(data =>{
                 datos=data
-                //console.log(data)
+                console.log(truck);
+                if (truck == "CAE"){
+                    console.log(vacio);
+                    data = vacio.concat(data)
+                    datos= data;
+                }
+                console.log(data)
                 road=[];
                 marker3.setLatLng([0,0])
                 if (data.length == 0){
@@ -186,11 +198,12 @@ function cambioh(){
             console.log("hola")
             var latitudd = datos[i].latitud;
             var longitudd = datos[i].longitud;
+            var rpm = datos[i].rpm;
         }
     }
     marker3.setLatLng([latitudd,longitudd])
    
-    let variable = ["fecha: "+x.options[o].text,"hora: "+x2.options[o2].text,"latitud: "+latitudd,"longitud: "+longitudd];
+    let variable = ["fecha: "+x.options[o].text,"hora: "+x2.options[o2].text,"latitud: "+latitudd,"longitud: "+longitudd, "rpm: "+rpm];
     marker3.bindPopup(`${variable}`)
 }
 function remove(id) {
@@ -201,4 +214,37 @@ function remove(id) {
 		var padre = imagen.parentNode;
 		padre.removeChild(imagen);
 	}
+}
+
+$('input[type="radio"]').on('click change', function(e) {
+    cambio.innerHTML = "Al hacer click sobre el mapa se creará un marcador, si presiona nuevamente se formará un rectangulo de busqueda. Escogerá la fecha que desee y despues la hora."
+    // if (rect){
+    //     map.removeLayer(rect);
+    //     rect = null 
+    // }
+    // i=0;
+
+});
+function consulta2(){
+    consulta={
+        id_t:"",
+        lat1:rect.getBounds().getSouth(),
+        lat2:rect.getBounds().getNorth(),
+        lon1:rect.getBounds().getWest(),
+        lon2:rect.getBounds().getEast()
+    }
+    
+    fetch("/historicos2",{
+        method: 'POST',
+        body: JSON.stringify(consulta),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    }).then(res =>{
+        return res.json()
+    }).then(datas =>{ 
+        vacio = null 
+        vacio=datas;
+        console.log(vacio);
+    });
 }

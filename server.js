@@ -1,19 +1,15 @@
 // jshint esversion: 6
 //data base conection 
 var mysql = require('mysql');
-var latitud, longitud, fecha, hora, mensaje;
+var latitud, longitud, fecha, hora, mensaje, mensaje1,rpmh,rpm,crpm,id ;
 var con = mysql.createConnection({
-    host: "caesolucionesiee.c7reutyzgzlp.us-east-1.rds.amazonaws.com",
-    user: "mauzoro",
-    password: "ronoroazoro123",
-    database: 'SyrusDataBase',
-    port : 3305
+  
 });
 
-//Udp conection
+//Udp conection (sniffer)
 const dgram = require('dgram');
 const UDP_PORT = '53000';
-const IP_ADRESS = '192.168.0.13';
+const IP_ADRESS = '192.168.0.9';
 const server = dgram.createSocket('udp4');
 server.on('error', (err) => {
     console.log(`server error:\n${err.stack}`);
@@ -23,19 +19,40 @@ server.on('error', (err) => {
 server.on('message', (msg, rinfo) => {
     //console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
     mensaje = msg.toString('utf8')
-    fecha = mensaje.slice(4, 17)
-    id = mensaje.slice(38, 42);
-    latitud = mensaje.slice(17, 25);
-    longitud = mensaje.slice(25, 34);
-
+    mensaje1 = mensaje.split(',');// mensaje = "qw,er,ty"      mensaje1 = mensaje.split(',')  => mensaje1 = ["qw","er","ty"]
+    fecha = mensaje1[1]
+    longitud = mensaje1[2]
+    latitud = mensaje1[3]
+    let rpm_cd = mensaje1[4] // <10c03 41 0c 12 32 wqr230
+    var index = rpm_cd.indexOf('4'); 
+    var h_rpm = rpm_cd.slice(index, index+12);
+    h_rpm = h_rpm.split(' ').join(''); //h_rpm= ["41","0c","12","32"] =join> 410c1232
+    crpm=h_rpm.slice(0,4);
+    if (crpm == "410C"){
+        var variable = h_rpm.slice(4,8)
+        rpm = parseInt(variable,16)/4;     
+      }  else {
+        rpm = 0
+      }
+    id = mensaje1[5];
     fech = new Date(parseFloat(fecha)-18000000);
     fecha = `${fech.getFullYear()}-${fech.getMonth() + 1}-${fech.getDate()}`;
     hora = `${fech.getHours()}:${fech.getMinutes()}:${fech.getSeconds()}`;
+    
+    // console.log(mensaje);
+    // console.log("Fecha: ",fecha);
+    // console.log("Hora: ",hora);
+    // console.log("Latitud: ",latitud);
+    // console.log("Longitud: ",longitud);
+    // console.log("Los rpm son: ",rpm);
+    // console.log("EL id es: ", id);
+   
+
     if (con) {
         console.log("Connected!");
-        var sql = "INSERT INTO Syrus (latitud,longitud,fecha,hora) VALUES ?";
+        var sql = "INSERT INTO Syrus (latitud,longitud,fecha,hora,rpm,id_t) VALUES ?";
         var values = [
-            [latitud, longitud, fecha, hora]
+            [latitud, longitud, fecha, hora,rpm,id]
         ];
         con.query(sql, [values], function(err, result) {
             if (err) throw err;
@@ -65,14 +82,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', function(request, response) {
-    response.sendFile(path.join(__dirname, '../mau/public/index.html'))
+    response.sendFile(path.join(__dirname, '../Mau/public/index.html'))
 });
+
+
 
 app.get('/tr', (req, res) => {
     if (con) {
         var sql = "SELECT * FROM Syrus ORDER BY id DESC limit 1 ";
         con.query(sql, function(err, result) {
             if (err) throw err;
+            console.log("correct");
             res.json(result[0]);
         });
     } else {
@@ -85,11 +105,12 @@ app.post("/historicos", (req,res)=>{
     if (con) {
         console.log("Connected!");
         var sql =
-          "SELECT * FROM Syrus where (fecha BETWEEN ? AND ?)AND (hora BETWEEN ? AND ?)";
+          "SELECT * FROM Syrus where id_t = ? AND TIMESTAMP(fecha,hora) BETWEEN TIMESTAMP(?,?) AND TIMESTAMP(?,?)";
         var value = [
+          req.body.id_t,
           req.body.fecha1,         
-          req.body.fecha2,
           req.body.hora1,
+          req.body.fecha2,
           req.body.hora2
         ];
         console.log(value)
@@ -107,8 +128,9 @@ app.post("/historicos2", (req,res)=>{
     if (con) {
         console.log("Connected!");
         var sql =
-        "SELECT * FROM Syrus WHERE(latitud  BETWEEN ? AND ? )AND (longitud  BETWEEN ? AND ?)";
+        "SELECT * FROM Syrus WHERE id_t = ? AND (latitud  BETWEEN ? AND ? )AND (longitud  BETWEEN ? AND ?)";
         var value = [
+          req.body.id_t,
           req.body.lat1,
           req.body.lat2,
           req.body.lon1,

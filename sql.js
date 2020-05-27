@@ -1,11 +1,7 @@
 var mysql = require('mysql');
 var latitud, longitud, fecha, hora, mensaje;
 var con = mysql.createConnection({
-    host: "caesolucionesiee.c7reutyzgzlp.us-east-1.rds.amazonaws.com",
-    user: "mauzoro",
-    password: "ronoroazoro123",
-    database: 'SyrusDataBase',
-    port : 3305
+    
 });
 if (con){
     console.log("conected")

@@ -1,11 +1,11 @@
-var lat, lon, fecha, hora, mensaj, poli,f1,f2,h1,h2,btn;
+var lat, lon, fecha, hora, mensaj, poli,f1,f2,h1,h2,btn,vacio;
 var road = []
 var tama=0;
 var n=1;
 let map = L.map('map').setView([10.99304, -74.82814], 13);
 const tileurl2 = 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
 L.tileLayer(tileurl2).addTo(map);
-var marcador = L.marker([0, 0]);
+var marcador = L.marker([100000, 100000]);
 marcador.addTo(map);
 //content
 
@@ -34,6 +34,8 @@ marcador.addTo(map);
         let polyline;
 
         btn.addEventListener("click",()=>{
+            var truck = document.querySelector('input[name="id"]:checked').value;
+            
             let f11 = new Date(f1.value).getTime();
             let f22 = new Date(f2.value).getTime();
             let t11 = h1.value.split(":");
@@ -49,9 +51,12 @@ marcador.addTo(map);
             console.log(f22)
             console.log(t22)
             if (total2 >= total1){
+                if (truck == "CAE"){
+                    busqueda_B()
+                }
                 console.log("En orden")
                 let data = {
-                    fecha1:f1.value,fecha2:f2.value, hora1:h1.value,  hora2:h2.value
+                    fecha1:f1.value,fecha2:f2.value, hora1:h1.value,  hora2:h2.value,id_t:"ID="+truck
                 }
                // console.log(data)
                 fetch("/historicos",{
@@ -63,7 +68,12 @@ marcador.addTo(map);
                 }).then(res =>{
                     return res.json()
                 }).then(data =>{
-                    console.log(data)
+                    console.log(data);
+                    if (truck == "CAE"){
+                        data = vacio.concat(data)
+                        console.log(data);
+                    }
+                    
                     if (data.length==0){
                         alert("No hay datos para mostrar")
                     }
@@ -76,10 +86,10 @@ marcador.addTo(map);
                         road[i] = {
                             lat: d.latitud,
                             lon: d.longitud,
-                          // marquer: L.marker([d.latitud,d.longitud]).bindPopup(`${[d.fecha,d.hora]}`).addTo(group),
+                           // marquer: L.marker([d.latitud,d.longitud]).bindPopup(`${[d.fecha,d.hora,d.rpm]}`).addTo(map),
                           
                         }
-                        
+                        //marcador[i] = road[i].marquer;
                     })
                     
                     polyline =L.polyline(road).addTo(map);
@@ -89,8 +99,27 @@ marcador.addTo(map);
             }
         })
      
+// funcion de busqueda en blanco 
+function busqueda_B(){
+    let data = {
+        fecha1:f1.value,fecha2:f2.value, hora1:h1.value,hora2:h2.value,id_t:""
+    }
+    
+    fetch("/historicos",{
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    }).then(res =>{
+        return res.json()
+    }).then(datas =>{ 
+        vacio = null 
+        vacio=datas;
+        console.log(vacio);
+    });
+}
 
-//contents = contents.substr(0,5);
 
 
 

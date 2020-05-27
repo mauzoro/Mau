@@ -16,7 +16,7 @@
 		crossorigin=""></script>
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="../static/assets/css/main.css" />
-		<link rel="stylesheet" href="../static/assets/css/main2.css" />
+		<link rel="stylesheet" href="../static/assets/css/realtime.css" />
 
 		<noscript><link rel="stylesheet" href="../static/assets/css/noscript.css" /></noscript>
 	</head>
@@ -45,11 +45,30 @@
 					</nav>
 
 				<!-- Main -->
-					<div id="main">
-
+				<div id="main">
+					<div id="consulta">
+								
+						<center>
+							
+							<div id="aparecer">
+								<form >
+									<input type="radio" name="id" id="CAE" value="CAE">
+									<label for="CAE" style="color: white;">CAE</label>
+									<input type="radio" name="id" id="JAM" value="JAM" checked>
+									<label for="JAM" style="color: white;" >JAM</label>
+									
+								</form>
+								
+							</div> 
+							
+					</center>
+				</div>
+					<div id="chartContainer" ></div>
+					<div id="map"></div>
 					
 
 					</div>
+
 
 				
 
@@ -69,5 +88,6 @@
 			<script src="../static/assets/js/util.js"></script>
 			<script src="../static/assets/js/main.js"></script>
 			<script src="../static/assets/js/real_time.js"></script>
+			<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 	</body>
 </html>
